@@ -7,8 +7,11 @@ import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import { DraftExpense } from "../types";
 import type {Value} from '../types'
+import { ErrorMessage } from "./ErrorMessage";
 
 ////////////////////////////////////////////////////////
+
+import { useBudget } from "../hooks/useBudget";
 
 export default function expenseForm() {
   const [expense, setExpense] = useState<DraftExpense>({
@@ -17,6 +20,11 @@ export default function expenseForm() {
     category: "",
     date: new Date(),
   });
+
+  //state para el error
+  const [error,setError] = useState('')
+
+  const {dispatch} = useBudget()
 
   //recuperamos la fecha seleccionada
   const handleChangeDate= (value:Value) =>{
@@ -45,17 +53,41 @@ export default function expenseForm() {
   };
 
 
+  //validamos si en el formulario hay campos en blanco
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>)=>{
+  e.preventDefault()
+  //validar
+  if(Object.values(expense).includes('')){
+    setError('Todos los campos son obligatorios')
+    return
+  }
+  //si no agregamos un nuevo gasto
+    dispatch({type:'add-expense',payload:{expense}})
 
+    //reiniciamos el formulario
+    setExpense({
+      amount:0,
+      expenseName:'',
+      category:'',
+      date:new Date()
+    })
+
+  }
 
 
   return (
-    <form action="" className="space-y-5">
+    <form action="" className="space-y-5" onSubmit={handleSubmit}>
       <legend
         className="uppercase text-center text-2xl font-black border-b-4
     border-blue-500 py-2"
       >
         Nuevo Gasto
       </legend>
+
+      {/* mostramos el modal de error 
+      pasamos error como children a errormensaje
+      */}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <div className="flex flex-col gap-2">
         <label htmlFor="expenseName" className="text-xl">
@@ -117,13 +149,6 @@ export default function expenseForm() {
           className="bg-slate-100 p-2 border-0"
           value={expense.date}
           onChange={handleChangeDate}
-        />
-        <input
-          type="number"
-          id="amount"
-          placeholder="Añande la cantidad"
-          className="bg-slate-100 p-2"
-          name="amount"
         />
       </div>
 
