@@ -1,5 +1,5 @@
 import { categories } from "../data/categories";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 /////////////////////////////////////////////////////
 //para que el calendario funcione
 import DatePicker from "react-date-picker";
@@ -24,7 +24,15 @@ export default function expenseForm() {
   //state para el error
   const [error,setError] = useState('')
 
-  const {dispatch} = useBudget()
+  const {dispatch,state} = useBudget()
+
+  //obtenemos el gastos que se esta editando
+  useEffect(()=>{
+    if(state.editingId){
+      const editingExpense = state.expenses.filter(currentExpense => currentExpense.id === state.editingId)[0]
+      setExpense(editingExpense)
+    }
+  },[state.editingId])
 
   //recuperamos la fecha seleccionada
   const handleChangeDate= (value:Value) =>{
@@ -61,8 +69,17 @@ export default function expenseForm() {
     setError('Todos los campos son obligatorios')
     return
   }
-  //si no agregamos un nuevo gasto
+
+  //si no ,agregamos un nuevo gasto o actualizamos
+  if(state.editingId){
+    //actuLIZAMOS
+    dispatch({type:'update_expense',payload:{expense:{id:state.editingId,...expense}}})
+
+  }else{
+    //agregamos
     dispatch({type:'add-expense',payload:{expense}})
+
+  }
 
     //reiniciamos el formulario
     setExpense({
@@ -71,9 +88,7 @@ export default function expenseForm() {
       category:'',
       date:new Date()
     })
-
   }
-
 
   return (
     <form action="" className="space-y-5" onSubmit={handleSubmit}>
@@ -81,7 +96,7 @@ export default function expenseForm() {
         className="uppercase text-center text-2xl font-black border-b-4
     border-blue-500 py-2"
       >
-        Nuevo Gasto
+        {state.editingId ? 'Guardar Cambios' : 'Nuevo cambio'}
       </legend>
 
       {/* mostramos el modal de error 
@@ -95,6 +110,7 @@ export default function expenseForm() {
         </label>
 
         <input
+          value={expense.expenseName}
           type="text"
           id="expenseName"
           placeholder="Añanade el nombre del gasto"
@@ -110,6 +126,7 @@ export default function expenseForm() {
         </label>
 
         <input
+        value={expense.amount}
           type="number"
           id="amount"
           placeholder="Añande la cantidad"
@@ -125,6 +142,7 @@ export default function expenseForm() {
         </label>
 
         <select
+        value={expense.category}
           id="category"
           className="bg-slate-100 p-2"
           name="category"
@@ -141,7 +159,7 @@ export default function expenseForm() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="amount" className="text-xl">
+        <label htmlFor="amount" className="text-xl" >
           Fecha Gasto:
         </label>
         {/* dependencia instalada */}
@@ -156,7 +174,7 @@ export default function expenseForm() {
         type="submit"
         className="bg-blue-600 cursor-pointer w-full p-2 text-white uppercase
       font-bold rounded-lg"
-        value={"Registrar Gasto"}
+        value={state.editingId ? 'Guardar Cambios' : 'Nuevo cambio'}
       />
     </form>
   );
