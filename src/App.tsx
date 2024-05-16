@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import BudgetForm from "./components/BudgetForm"
 import { useBudget } from "./hooks/useBudget"
 import { BudgetTracker } from "./components/BudgetTracker"
@@ -12,6 +12,12 @@ function App() {
   //state.budget contiene la cantidad que se escribio
   const isValidBudget = useMemo(()=> state.budget>0,[state.budget])
  
+  //colocamos los datos en el localstorage cada vez que el state cambie
+  useEffect(()=>{
+  localStorage.setItem('budget',state.budget.toString())
+  localStorage.setItem('expenses',JSON.stringify(state.expenses))
+  },[state])
+
   return (
     <>
     <header className="bg-blue-600 py-8 max-h-72 ">
