@@ -8,6 +8,7 @@ import { useBudget } from "../hooks/useBudget"
 
 export const BudgetTracker = () => {
   
+  //state y constantes globales
   const {state,totalExpenses,remainigBudget,dispatch} = useBudget()
   
   //calculamos el porcentaje del presupuesto 

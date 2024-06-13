@@ -10,10 +10,11 @@ import type {Value} from '../types'
 import { ErrorMessage } from "./ErrorMessage";
 
 ////////////////////////////////////////////////////////
-
+//
 import { useBudget } from "../hooks/useBudget";
 
 export default function expenseForm() {
+  //state para un gasto temporal y tendra un objeto como estado inicial
   const [expense, setExpense] = useState<DraftExpense>({
     amount: 0,
     expenseName: "",
@@ -21,21 +22,22 @@ export default function expenseForm() {
     date: new Date(),
   });
 
-
+  //
   const [previousAmount,setPreviousAmount] = useState(0)
 
 
   //state para el error
   const [error,setError] = useState('')
 
+  //disparador , el estado de mi app y el presupuesto restante
   const {dispatch,state,remainigBudget} = useBudget()
 
   //obtenemos el gastos que se esta editando
   useEffect(()=>{
     if(state.editingId){
       const editingExpense = state.expenses.filter(currentExpense => currentExpense.id === state.editingId)[0]
-      setExpense(editingExpense)
-      setPreviousAmount(editingExpense.amount) 
+      setExpense(editingExpense)//gasto que se quiere editar de un presupuesto
+      setPreviousAmount(editingExpense.amount)//cantidad del presupuesto 
     }
   },[state.editingId])
 
@@ -77,7 +79,7 @@ export default function expenseForm() {
 
   //validar que no pase el limite
   if((expense.amount - previousAmount) > remainigBudget){
-    setError('Prepuesto rebasado ')
+    setError('Prepuesto rebasado')
     return
   }
 

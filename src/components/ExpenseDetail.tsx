@@ -18,17 +18,20 @@ import AmountDisplay from "./AmountDisplay";
 import { categories } from "../data/categories";
 import { useBudget } from "../hooks/useBudget";
 
+//tipo para el gasto
 type ExpenseDetailProps = {
   expenses: Expense;
 };
+//detalle del gasto - recibe un gasto
 export const ExpenseDetail = ({ expenses }: ExpenseDetailProps) => {
+
   //obtenermos el objeto de la categoria
   const categoryInfo = useMemo(
     () => categories.filter((cat) => cat.id === expenses.category)[0],
     [expenses]
   );
 
-//
+  //disparador de acciones o metodos
   const {dispatch}= useBudget()
 
   //Animacion para actualizar
